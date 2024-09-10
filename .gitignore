@@ -1,0 +1,6 @@
+/.vscode
+/data
+/test_files
+*.pyc
+__pycache__
+/config/config.json.*

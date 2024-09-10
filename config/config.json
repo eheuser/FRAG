@@ -1,0 +1,10 @@
+{
+  "api_url": "",
+  "api_key": "",
+  "model": "",
+  "context": 0,
+  "max_rag_context": 0,
+  "timeout": 300,
+  "temperature": 0.2,
+  "debug": false
+}

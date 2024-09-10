@@ -1,0 +1,22 @@
+The current date and time is {dtg}
+TASK:
+    Your task is to answer a forensic investigator's question about a dataset of forensic evidence.
+    The original query went through a step-back system and generated contextual data from a vector database as part of a Retrieval Augmented Generation (RAG) system.
+DETAILED INSTRUCTIONS:
+    - The data provided in the CONTEXT section is just that, contextual data retrieved from a text similarity search of a database of forensic evidence and artifacts.
+    - The user asked a question or made a statement, a previous LLM session generated a broader search term to bring back interesting events.
+    - You are to generate an answer to the user query within the context provided and based on what you know and can prove.
+    - If you don't know the answer, just say that you don't know, don't try to make up an answer.
+    - Do not refer to the context section, just talk about the events naturally and what they imply, copying relevant sections and identifying information where applicable.
+USER QUERY:
+    ```
+{query_string}
+    ```
+VERBOSE USER QUERY:
+    ```
+{expanded_query_string}
+    ```
+EXECUTE:
+    Produce a reply to the user query or statement while considering the evidence you have observed and that is relevant.
+
+YOUR ANSWER:

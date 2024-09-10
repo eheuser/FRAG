@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FRAG</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="../css/theme.css" rel="stylesheet" type="text/css" />
+    <!--Highlight.js-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!--MarkedJS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/14.0.0/marked.min.js"
+        integrity="sha512-EnAXYDyFPJkTNa50ueQCSHjQGVOp8I9MiRrb3WMeY7x9IO+qdOElSRNvH35Sfk6+0uS4HV954WbpVDKAxjJPiA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</head>
+
+<body class="ui-bg">
+    <div class="btn-group ps-2 mb-1" role="group" style="width: 100%;">
+        <div class="row px-0 mx-0" style="width: 8px;"></div>
+        <div class="btn btn-lg menu-btn btn-emerge bi bi-files fw-bolder shadow-light px-0 mt-1" data-bs-toggle="modal" id="files_modal_mm_btn"
+            data-bs-target="#files_modal" title="Manage artifact files" onclick="loadLlmFiles();"></div>
+        <div class="row px-0 mx-0" style="width: 8px;"></div>
+        <div class="btn btn-lg menu-btn btn-emerge bi bi-gear fw-bolder shadow-light px-0 mt-1" data-bs-toggle="modal" id="configure_modal_mm_btn"
+            data-bs-target="#configure_modal" title="Configuration options" onclick="loadLlmConfig();"></div>
+        <div class="d-flex" style="width: calc(100% - 124px);">
+            <div class="flex-grow-1"></div>
+            <span title="Reset query">
+                <div class="btn btn-outline-primary menu-btn bi-trash fw-bolder mt-1 me-3" id="reset_query_button" onclick="resetChat(this);"></div>
+            </span>
+            <span title="Cancel query">
+                <div class="btn btn-outline-danger menu-btn bi-x-lg fw-bolder mt-1 me-3 disabled"  id="cancel_query_btn" onclick="cancelRagSearch(this);"></div>
+            </span>
+            <span title="Query status">
+                <div class="btn btn-outline-secondary text-truncate fw-bolder px-3 mt-1 me-3 disabled" style="width: 300px;padding-top: 11px;"
+                    id="llm_generation_status">
+                    Idle
+                </div>
+            </span>
+            <div class="btn btn-primary px-3 mt-1 me-3 active" data-bs-toggle="button"
+                style="width: 200px;padding-top: 11px;" id="enable_llm_generation" title="Toggle LLM / similarity modes">
+                <b class="ps-1">LLM Enabled</b>
+                <span class="bi bi-circle-fill text-success ms-2 px-0 py-0"></span>
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid px-0 py-0" style="height: 100%;overflow-y: hidden;">
+        <div class="container-fluid px-0 pb-3" id="chat_container">
+            <div class="row px-0 py-0 mx-0 my-0" style="height: 100%;">
+                <div class="col col-3 pe-0 pb-0">
+                    <div class="container-flex px-0 py-0 outline-container" style="position: relative;">
+                        <!--Header-->
+                        <div class="btn-group bg-secondary" role="group"
+                            style="width: 100%;border-radius: 4px 4px 0px 0px;">
+                            <div class="btn btn-lg btn-secondary text-start disabled"
+                                style="border-radius: 4px 4px 0px 0px; border: 0px;">
+                                Reasoner
+                            </div>
+                            <div class="flex-grow-1"></div>
+                            <div class="form-check form-switch py-0" style="cursor: pointer;">
+                                <label class="form-check-label py-0" for="verbose_reasoner_output" style="cursor: pointer;">
+                                    <div class="btn btn-lg btn-secondary disabled py-0 mt-2">Verbose</div>
+                                </label>
+                                <input class="form-check-input mt-3" type="checkbox" value="" id="verbose_reasoner_output"  style="cursor: pointer;" checked>
+                            </div>
+                            <div class="btn btn-lg btn-secondary bi bi-mortarboard text-end disabled me-2"></div>
+                        </div>
+                        <!--Search-->
+                        <div class="btn-group bg-secondary" role="group" style="width: 100%;border-radius: 0px;">
+                            <div class="btn bi bi-highlighter ps-3 text-white disabled"
+                                style="border: 0px;border-radius: 0px;" id="reasoner_highlight_icon">
+                            </div>
+                            <input class="form-control pe-3 mb-1" type="search" spellcheck="false" autocomplete="off"
+                                placeholder=" Highlight" id="reasoner_highlight_input"
+                                style="width: 100%;border: 0px;border-radius: 4px;">
+                            <div class="btn btn-sm text-white disabled"
+                                style="border: 0px;border-radius: 0px;width: 8px;">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar bg-secondary underline-container pb-1" role="group"
+                            style="width: 100%;border-radius: 0px 0px 0px 0px;">
+                            <span title="Highlighter match count">
+                                <div class="btn btn-sm text-white disabled" style="border: 0px;border-radius: 0px;">
+                                    <div class="badge btn-emerge-flat text-black mt-1 py-1 px-0" style="width: 32px;" id="reasoner_highlight_badge">0</div>
+                                </div>
+                            </span>
+                            <div class="flex-grow-1"></div>
+                            <!--Scroll Page Up/Down-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-up fw-bolder mx-1" title="Scroll page up"
+                                onclick="scrollPageUp('reasoner_output');"></div>
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-down fw-bolder me-3" title="Scroll page down"
+                                onclick="scrollPageDown('reasoner_output');"></div>
+                            <!--Scroll to Top/Bottom-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-double-up fw-bolder mx-1" title="Scroll to top"
+                                onclick="scrollToTop('reasoner_output');"></div>
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-double-down fw-bolder me-3" title="Scroll to bottom"
+                                onclick="scrollToBottom('reasoner_output');"></div>
+                        </div>
+                        <!--Body-->
+                        <a class="btn follow-output text-center bi bi-chevron-down" id="follow_reasoner_output"
+                            style="visibility: hidden;" onclick="followOutput('reasoner_output');"></a>
+                        <div class="container-flex px-2 pt-2"
+                            style="height: calc(100vh - 344px);border-radius: 6px;overflow-y: scroll;overflow-x: hidden;scroll-behavior: auto;width: 100%;"
+                            id="reasoner_output">
+                        </div>
+                    </div>
+                </div>
+                <div class="col col-6 px-1">
+                    <div class="container-flex px-0 py-0 outline-container" style="position: relative;">
+                        <!--Header-->
+                        <div class="btn-group bg-secondary" role="group"
+                            style="width: 100%;border-radius: 4px 4px 0px 0px;">
+                            <div class="btn btn-lg btn-secondary text-start disabled"
+                                style="border-radius: 4px 4px 0px 0px; border: 0px;">
+                                Chat
+                            </div>
+                            <div class="flex-grow-1"></div>
+                            <div class="btn btn-lg btn-secondary bi bi-chat-right text-end disabled me-2"></div>
+                        </div>
+                        <!--Search-->
+                        <div class="btn-group bg-secondary" role="group" style="width: 100%;border-radius: 0px;">
+                            <div class="btn bi bi-highlighter ps-3 text-white disabled"
+                                style="border: 0px;border-radius: 0px;" id="chat_highlight_icon">
+                            </div>
+                            <input class="form-control pe-3 mb-1" type="search" spellcheck="false" autocomplete="off"
+                                placeholder=" Highlight" id="chat_highlight_input" style="width: 100%;border: 0px;border-radius: 4px;">
+                            <div class="btn btn-sm text-white disabled"
+                                style="border: 0px;border-radius: 0px;width: 8px;">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar bg-secondary underline-container pb-1" role="group"
+                            style="width: 100%;border-radius: 0px 0px 0px 0px;">
+                            <span title="Highlighter match count">
+                                <div class="btn btn-sm text-white disabled" style="border: 0px;border-radius: 0px;">
+                                    <div class="badge btn-emerge-flat text-black mt-1 py-1 px-0" style="width: 32px;"
+                                        id="chat_highlight_badge">0</div>
+                                </div>
+                            </span>
+                            <div class="flex-grow-1"></div>
+                            <!--Scroll Page Up/Down-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-up fw-bolder mx-1" title="Scroll page up"
+                                onclick="scrollPageUp('chat_output');"></div>
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-down fw-bolder me-3" title="Scroll page down"
+                                onclick="scrollPageDown('chat_output');"></div>
+                            <!--Scroll to Top/Bottom-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-double-up fw-bolder mx-1" title="Scroll to top"
+                                onclick="scrollToTop('chat_output');"></div>
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-double-down fw-bolder me-3" title="Scroll to bottom"
+                                onclick="scrollToBottom('chat_output');"></div>
+                        </div>
+                        <!--Body-->
+                        <a class="btn follow-output text-center bi bi-chevron-down" id="follow_chat_output"
+                            style="visibility: hidden;" onclick="followOutput('chat_output');"></a>
+                        <div class="container-flex px-0 pt-2"
+                            style="height: calc(100vh - 344px);border-radius: 6px;overflow-y: scroll;overflow-x: hidden;scroll-behavior: auto;width: 100%;"
+                            id="chat_output">
+                            <!--Assistant-->
+                            <div class="row px-0 mb-3">
+                                <div class="col col-1 pt-0 pe-0">
+                                    <div class="circle-icon mt-1 me-2" style="float: right;">
+                                        <img src="../img/android-chrome-192x192.png" alt="FRAG Agent">
+                                    </div>
+                                </div>
+                                <div class="col col-10 ps-0 px-0 mx-0">
+                                    <div class="card a-card px-3">
+                                        <div class="card-body" id="assistant_example_output">
+                                            This is <b>FRAG</b>, the <b>F</b>orensic <b>R</b>etrieval <b>A</b>ugmented
+                                            <b>G</b>eneration assistant.
+                                            You can ask questions about the parsed artifacts or toggle the LLM feature
+                                            off and
+                                            query the data with keywords and similarity phrases.
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col col-1 ps-1 pt-2">
+                                    <div class="btn btn-sm btn-emerge-flat bi-copy" style="border-radius: 999px;"
+                                        onclick="copyDiv2Clipboard('assistant_example_output');"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col col-3 ps-0">
+                    <!--Header-->
+                    <div class="container-flex px-0 py-0 outline-container">
+                        <div class="btn-group bg-secondary" role="group"
+                            style="width: 100%;border-radius: 4px 4px 0px 0px;">
+                            <div class="btn btn-lg btn-secondary text-start disabled"
+                                style="border-radius: 4px 4px 0px 0px; border: 0px;">
+                                Context
+                            </div>
+                            <div class="flex-grow-1"></div>
+                            <div class="btn btn-lg btn-secondary bi bi-card-text text-end disabled me-2"></div>
+                        </div>
+                        <!--Search-->
+                        <div class="btn-group bg-secondary" role="group" style="width: 100%;border-radius: 0px;">
+                            <div class="btn bi bi-highlighter ps-3 text-white disabled"
+                                style="border: 0px;border-radius: 0px;" id="event_highlight_icon">
+                            </div>
+                            <input class="form-control pe-3 mb-1" type="search" spellcheck="false" autocomplete="off"
+                                placeholder=" Highlight" id="event_highlight_input" 
+                                style="width: 100%;border: 0px;border-radius: 4px;">
+                            <div class="btn btn-sm text-white disabled"
+                                style="border: 0px;border-radius: 0px;width: 8px;">
+                            </div>
+                        </div>
+                        <div class="btn-toolbar bg-secondary underline-container pb-1" role="group"
+                            style="width: 100%;border-radius: 0px 0px 0px 0px;">
+                            <span title="Highlighter match count">
+                                <div class="btn btn-sm text-white disabled" style="border: 0px;border-radius: 0px;">
+                                    <div class="badge btn-emerge-flat text-black mt-1 py-1 px-0" style="width: 32px;"
+                                        id="event_highlight_badge" title="Highlighter match count">0</div>
+                                </div>
+                            </span>
+                            <div class="flex-grow-1"></div>
+                            <!--Copy-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-copy fw-bolder me-3" title="Copy events to clipboard"
+                                onclick="copyEvents2Clipboard(this);"></div>
+                            <!--Scroll Page Up/Down-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-up fw-bolder mx-1" title="Scroll page up"
+                                onclick="scrollPageUp('event_output');"></div>
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-down fw-bolder me-3" title="Scroll page down"
+                                onclick="scrollPageDown('event_output');"></div>
+                            <!--Scroll to Top/Bottom-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-double-up fw-bolder mx-1" title="Scroll to top"
+                                onclick="scrollToTop('event_output');"></div>
+                            <div class="btn btn-sm btn-emerge-flat bi bi-chevron-double-down fw-bolder me-3" title="Scroll to bottom"
+                                onclick="scrollToBottom('event_output');"></div>
+                            <!--Expand/Collapse All Events-->
+                            <div class="btn btn-sm btn-emerge-flat bi bi-plus-lg fw-bolder mx-1" title="Expand all events"
+                                onclick="expandChatEvt();"></div>
+                            <div class="btn btn-sm btn-emerge-flat bi bi-dash-lg fw-bolder me-3" title="Minimize all events"
+                                onclick="collapseChatEvt();"></div>
+                        </div>
+                        <!--Body-->
+                        <div class="container-flex px-2 pt-2"
+                            style="height: calc(100vh - 344px);border-radius: 6px;overflow-y: scroll;overflow-x: hidden;scroll-behavior: smooth;width: 100%;"
+                            id="event_output">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container input-bg shadow px-5 py-0 my-0" style="border-radius: 32px;position: relative;">
+        <div class="btn-toolbar" role="toolbar">
+            <textarea class="form-control form-control-lg auto-expand input-bg" rows="1"
+                placeholder="Question or Search Term" aria-label="With textarea"
+                style="border-radius: 6px;border: 0px !important;width: calc(100% - 174px);overflow-y: auto;height: 54px;"
+                id="chat_input"></textarea>
+            <div class="btn bi bi-arrow-up-circle btn-emerge shadow me-5 mb-1 text-monospace" id="chat_submit"
+                style="border-radius: 16px;width: 170px;position: absolute;bottom: 0;right: 0;font-size: 20px;">
+                <span class="px-2">Submit</span>
+            </div>
+        </div>
+    </div>
+    <div class="container text-center px-0 py-0 mt-3">
+        <small class="text-secondary" style="width: 100%;"><b>FRAG</b>: Forensic Retrieval Augmented
+            Generation</small>
+    </div>
+    </div>
+    <div class="modal fade" data-bs-backdrop="true" id="files_modal" tabindex="-1">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content ui-bg" style="border-radius: 16px;">
+                <div class="modal-header">
+                    <h3 id="schema_modal_header" class="modal-title text-muted" style="pointer-events: none;">Artifact
+                        Files
+                    </h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body ps-2 pe-1"
+                    style="border-radius: 4px;height: 50vh;">
+                    <div class="container" id="files_modal_body">
+                        <div class="mb-1">
+                            <label for="artifact_file_upload" class="form-label bi bi-upload ps-1"><span class="ps-2">Upload Artifact Files</span></label>
+                            <input class="form-control form-control-lg" type="file" id="artifact_file_upload" multiple onchange="uploadArtifactFiles(this.files);">
+                          </div>
+                        <div class="container-flex" style="height: calc(50vh - 130px);overflow-x: hidden;overflow-y: scroll;scroll-behavior: smooth;">
+                            <table class="table mt-3">
+                                <thead>
+                                <tr>
+                                    <th scope="col">Filepath</th>
+                                    <th scope="col">File Size</th>
+                                    <th scope="col">File Type</th>
+                                    <th scope="col">Events</th>
+                                </tr>
+                                </thead>
+                                <tbody id="artifact_file_table">
+                                </tbody>
+                            </table>
+                          </div>
+                    </div>
+                </div>
+                <div id="files_modal_footer" class="modal-footer">
+                    <span title="Delete Artifact Files">
+                        <button type="button" class="btn btn-lg btn-outline-danger shadow me-3" data-bs-toggle="modal" data-bs-target="#delete_db_warn_modal" style="width: 160px;">Delete Files</button>
+                    </span>
+                    <span title="Close panel">
+                        <button type="button" class="btn btn-lg btn-emerge shadow" data-bs-dismiss="modal">Close</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" data-bs-backdrop="true" id="configure_modal" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content ui-bg" style="border-radius: 16px;">
+                <div class="modal-header">
+                    <h3 id="schema_modal_header" class="modal-title text-muted" style="pointer-events: none;">Configure
+                    </h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body ps-2 pe-1">
+                    <div class="container" id="configure_modal_body">
+                        <div class="row align-items-center">
+                            <div class="col-2 text-end">
+                                <label for="config_form_api_url" class="col-form-label">API URL</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="search" id="config_form_api_url" class="form-control" placeholder="API URL" value="https://api.openai.com/v1">
+                            </div>
+                        </div>
+                        <div class="row align-items-center mt-2">
+                            <div class="col-2 text-end">
+                                <label for="config_form_api_key" class="col-form-label">API Key</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="search" id="config_form_api_key" class="form-control" placeholder="sk-nOB2PN7NOSFvI8OFpZksT3BlbkFJZKF3K0n56fbh2l7BR...">
+                            </div>
+                        </div>
+                        <div class="row align-items-center mt-2">
+                            <div class="col-2 text-end">
+                                <label for="config_form_model" class="col-form-label">Model</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="search" id="config_form_model" class="form-control" placeholder="Specify model for supported API endpoints" value="gpt-4o-mini">
+                            </div>
+                        </div>
+                        <div class="row align-items-center mt-2">
+                            <div class="col-2 text-end">
+                                <label for="config_form_ctx" class="col-form-label">Max Context</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="search" id="config_form_ctx" class="form-control" placeholder="Maximum Context Length in Tokens" value="128000">
+                            </div>
+                        </div>
+                        <div class="row align-items-center mt-2">
+                            <div class="col-2 text-end">
+                                <label for="config_form_ctx_max" class="col-form-label">Max Event Context</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="search" id="config_form_ctx_max" class="form-control" placeholder="Maximum Context Event Context Length in Tokens" value="90000">
+                            </div>
+                        </div>
+                        <div class="row align-items-center mt-2">
+                            <div class="col-2 text-end">
+                                <label for="config_form_timeout" class="col-form-label">Timeout</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="search" id="config_form_timeout" class="form-control" placeholder="Timeout in seconds" value="300">
+                            </div>
+                        </div>
+                        <div class="row align-items-center mt-2">
+                            <div class="col-2 text-end">
+                                <label for="config_form_temperature" class="col-form-label">Temperature</label>
+                            </div>
+                            <div class="col-10">
+                                <input type="search" id="config_form_temperature" class="form-control" placeholder="Model output temperature from 0.0 to 2.0" value="0.4">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="configure_modal_footer" class="modal-footer">
+                    <span title="Apply changes">
+                        <button type="button" class="btn btn-lg btn-outline-success shadow me-3 disabled" id="config_form_apply" onclick="applyConfig();">Apply</button>
+                    </span>
+                    <span title="Discard changes">
+                        <button type="button" class="btn btn-lg btn-outline-danger shadow me-3 disabled" id="config_form_discard" onclick="loadLlmConfig();">Discard</button>
+                    </span>
+                    <span title="Clear existing values">
+                        <button type="button" class="btn btn-lg btn-outline-warning shadow me-3" id="config_form_clear" onclick="clearLlmConfig();">Clear</button>
+                    </span>
+                    <span title="Close panel">
+                        <button type="button" class="btn btn-lg btn-emerge shadow" data-bs-dismiss="modal">Close</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="upload_file_progress_modal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="py-0 ps-2" style="cursor: default;">Uploading Artifact(s)</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="container" id="upload_file_progress_modal_body">
+                        <div class="container-flex">
+                            <div class="progress" title="File upload progress" style="border-radius: 4px !important;height: 32px;">
+                                <div id="upload_file_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%;border-radius: 4px !important;cursor: default;font-size: 24px;">
+                                    0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="parse_file_progress_modal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="col">
+                        <h2 class="py-0 ps-2" style="cursor: default;" id="parse_file_progress_title">
+                            Parsing Artifact(s)
+                        </h2>
+                    </div>
+                    <div class="col col-sm-auto">
+                        <div class="spinner-border me-3" role="status"></div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="container" id="parse_file_progress_modal_body">
+                        <div class="container-flex">
+                            <div class="progress" title="File parsing progress" style="border-radius: 4px !important;height: 32px;">
+                                <div id="parse_file_progress" class="progress-bar bg-success" role="progressbar" style="width: 0%;border-radius: 4px !important;cursor: default;font-size: 24px;">
+                                    0%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="delete_db_warn_modal" data-bs-keyboard="false" data-bs-backdrop="static" tabindex="-1">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="py-0 ps-2" style="cursor: default;" id="delete_db_warn_title">
+                        Delete Artifact Database?
+                    </h2>
+                </div>
+                <div class="modal-body">
+                    <div class="container" id="delete_db_warn_modal_body">
+                        <div class="container-flex text-center">
+                            <h5 class="mb-3">
+                                This will delete all events and is irreversible.
+                            </h5>
+                            <button type="button" class="btn btn-lg btn-outline-danger shadow me-3" onclick="deleteVectorDB(this);" style="width: 100%;">Delete Files</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <span title="Close panel">
+                        <button type="button" class="btn btn-lg btn-emerge shadow" data-bs-dismiss="modal" onclick="openArtifactModal();">Back</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" autohide="true" data-bs-delay="5000" animation="true">
+            <div class="toast-header">
+                <span class="bi bi-copy pe-2"></span>
+                <strong class="me-auto">Clipboard</strong>
+                <small>Just Now</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body" id="toastText">
+            </div>
+        </div>
+    </div>
+</body>
+
+<!-- Application -->
+<script src="../js/utils.js"></script>
+<script src="../js/chat.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/frag_app.js"></script>
+
+</html>

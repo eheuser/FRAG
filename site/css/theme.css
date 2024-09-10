@@ -1,0 +1,239 @@
+html {
+    font-size: 18px;
+    font-family: Arial, sans-serif;
+}
+
+::-webkit-scrollbar-corner {
+    background: #0d0e10 !important;
+    border: 6px solid black;
+}
+
+::-webkit-scrollbar {
+    width: 18px;
+    background: #1e212520;
+}
+
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: inset 0 0 0px #0d0e10;
+    box-shadow: inset 0 0 2px #15181a;
+    border-radius: 0px 0px 4px 0px !important;
+    border-top: 0px;
+}
+
+::-webkit-scrollbar:hover {
+    background: #213d5f15;
+}
+
+::-webkit-scrollbar-thumb {
+    border: 1px solid #aaaaaa;
+    border-radius: 6px !important;
+    background-color: #213d5f60;
+    -webkit-box-shadow: inset 0 0 0px #0d0e10;
+    box-shadow: inset 0 0 0px #0d0e10;
+    min-height: 64px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    border: 1px solid #aaaaaa;
+    background-color: #8eb9fa;
+}
+
+.ui-bg {
+    background-color: #f1f1f1;
+}
+
+.ui-fg {
+    background-color: #dfdfdf;
+    border: 1px solid #aaaaaa;
+}
+
+.input-bg {
+    background-color: #dfdfdf !important;
+    color: #000 !important;
+    border: 1px solid #aaaaaa !important;
+}
+
+.shadow {
+    box-shadow: -2px 2px 3px #040405aa;
+}
+
+.shadow-light {
+    box-shadow: -2px 2px 3px #04040530;
+}
+
+.shadow-lg {
+    box-shadow: -12px 12px 6px #040405aa;
+}
+
+.btn-emerge {
+    background-color: #8eb9fa !important;
+    border: 1px solid #aaaaaa60;
+}
+
+.btn-emerge:hover {
+    background-color: #0d6efd !important;
+    border: 1px solid #aaaaaa;
+}
+
+.btn-emerge-flat {
+    background-color: #f1f1f1;
+    border: 1px solid #aaaaaa60;
+}
+
+.btn-emerge-flat:hover {
+    background-color: #8eb9fa !important;
+    border: 1px solid #aaaaaa;
+}
+
+.btn-emerge-static {
+    background-color: #8eb9fa !important;
+    border: 1px solid #aaaaaa60;
+}
+
+.u-icon {
+    background-color: #0d6efd !important;
+    color: #fff;
+    border: 1px solid #aaaaaa60;
+}
+
+.menu-btn {
+    padding-top: 11px !important;
+    font-size: 20px !important;
+    border-radius: 999px !important;
+    width: 52px !important;
+    height: 52px !important;
+}
+
+.auto-expand {
+    resize: none;
+    overflow: hidden;
+}
+
+.a-card {
+    background-color: #dfdfdf;
+    border: 0px;
+}
+
+.u-card {
+    background-color: #f1f1f1;
+    border: 1px solid #aaaaaa;
+}
+
+.circle-icon {
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Adjust size as needed */
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0; /* Optional background color */
+}
+
+.circle-icon img {
+    width: 80%; /* Adjust the size of the image relative to the circle */
+    height: auto;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.1rem #0d6efd30;
+}
+
+pre {
+    white-space: pre-wrap;
+}
+
+code {
+    background-color: #dfdfdf;
+    border-radius: 8px;
+}
+
+p {
+    margin: 0px;
+    padding: 0px;
+}
+
+
+@keyframes blink {
+    50% {
+        color: transparent
+    }
+}
+
+.loader__dot {
+    animation: 1.5s blink infinite
+}
+
+.loader__dot:nth-child(2) {
+    animation-delay: 350ms
+}
+
+.loader__dot:nth-child(3) {
+    animation-delay: 650ms
+}
+
+.outline-container {
+    border: 2px solid #aaaaaa;
+    border-radius: 6px;
+}
+
+.underline-container {
+    border-bottom: 2px solid #aaaaaa;
+}
+
+mark {
+    background-color: #8eb9fa;
+    border-radius: 2px;
+    padding: 0px;
+}
+
+.partial-collapse {
+    display: -webkit-box;
+    -webkit-line-clamp: 8;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: max-height 0.25s ease-in-out;
+    max-height: 12.5em;
+}
+
+.partial-collapse.expanded {
+    -webkit-line-clamp: unset;
+    max-height: none;
+}
+
+.follow-output {
+    background:#8eb9fa;
+    color: #aaaaaa;
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    width: 48px;
+    height: 48px;
+    font-size: 34px;
+    -webkit-text-stroke: 1px;
+    opacity: 0.50;
+    transition: opacity 0.5s ease-in-out;
+    padding: 0px;
+    z-index: 999;
+}
+
+.follow-output:hover {
+    background:#8eb9fa;
+    color: #000000aa;
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 999px;
+    width: 48px;
+    height: 48px;
+    font-size: 34px;
+    -webkit-text-stroke: 2px;
+    opacity: 0.90;
+    transition: opacity 0.5s ease-in-out;
+    padding: 0px;
+    z-index: 999;
+}

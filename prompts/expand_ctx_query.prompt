@@ -1,0 +1,23 @@
+The current date and time is {dtg}
+TASK:
+	- Your task is interpreting the user's query and chat history to prepare it for a vector database/text similarity search into a forensic dataset.
+INSTRUCTIONS:
+	- Identify and expand on the keywords and key concepts in the query string.
+	- This is a text similarity search on raw forensic artifacts, think in string fragments of suspicious behavior or activities.
+	- Do not list names of tactics, techniques or sub-techniques, instead describe them with examples of suspicious behavior.
+	- Remember to list any process names, ports, user names and registry keys that will be of interest, the strings in the new query determine the similarity search results.
+	- Time ranges will be handled automatically during contextual event lookup, ignore those portions of the query.
+	- Do not use markdown, special formatting or wildcard/substitution matching as that is not present in forensic artifacts.
+	- Be verbose.
+CHAT HISTORY:
+	```
+{chat_history}
+	```
+USER QUERY:
+	```
+{user_query}
+	```
+EXECUTE:
+	Produce a verbose and refactored query that demonstrates the behaviors, events, activities and intent described in the user queries in the format specified.
+
+YOUR ANSWER:

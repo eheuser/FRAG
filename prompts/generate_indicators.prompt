@@ -1,0 +1,43 @@
+The current date and time is {dtg}
+
+TASK:
+    Iteratively produce a new and comprehensive list of up to 100 string indicators of compromise (IOC). 20 at a time.
+	The string IOC's will be used to search a forensic dataset for the listed MITRE Techniques and Sub-Techniques in order to answer the user query.
+	This prompt will run several times and collect unique search strings in a JSON format in order to add accurate and relevant context to the query.
+    The events are all Windows EVTX logs, the hard drive's $MFT Master File Table entries, Registry Hives and PE's all parsed into plain text (Key: Value).
+DETAILED INSTRUCTIONS:
+    - Follow these instructions and the JSON output format under EXAMPLE OUTPUT **exactly**.
+	- The output will be read by python's json.loads(), do not leave comments or invalid JSON output.
+    - Original and specific strings are required, not descriptions of types of behavior or placeholder/wildcard values, but actual Indicators of Compromise that you might have seen from signatures built for tools like Sigma, HELK, YARA and Splunk.
+    - By **very** specific and pay close attention to the user's query.
+    - If the user query mentions specific executable names, paths or registry keys, include those string IOC's in an intelligent way that will bring back relevant data from a `<document> contains <string>"` string search query.
+EXAMPLE QUERY:
+    ```
+        I'd like you to look for evidence of Powershell misuse and other suspicious commands on this host.  We've received alerts from several hosts for the past week.
+    ```
+EXAMPLE OUTPUT:
+[
+	"powershell.exe",
+	"powershell",
+	"pwsh",
+	"IEX",
+	"encodedcommand",
+	"nop",
+	"noni",
+	"-enc",
+	"-exec",
+	"Invoke-WebRequest",
+	"Invoke-RestMethod",
+	"downloadstring",
+	"bypass",
+	"Reflection.Assembly",
+	"System.IO.File",
+	"bxor",
+	"base64",
+	"ScriptBlockText"
+]
+USER QUERY:
+    ```
+{query_string}
+    ```
+OUTPUT:

@@ -1,0 +1,24 @@
+The current date and time is {dtg}
+
+TASK:
+    Extract any direct or indirect time ranges from the user query to narrow down searches into a vector database for a RAG system
+DETAILED INSTRUCTIONS:
+    - Follow these instructions **exactly**, especially the formatting instructions.
+    - The user query **might** contain a time range, if it does not only return an empty JSON dictionary.
+    - If there is a time range in the request, output a dictionary in JSON format with `start` and `end` keys that are formatted with ISO 8601/RFC 3339.
+    - The output will be read by python's json.loads(), do not leave comments, markdown or invalid JSON output.
+EXAMPLE QUERY:
+    ```
+        The current date and time is 2024-09-10T16:59:59Z
+        I'd like you to look for evidence of Powershell misuse and other suspicious commands on this host.  We've received alerts from several hosts for the past week.
+    ```
+EXAMPLE OUTPUT:
+{{
+    "start": "2024-09-03T17:00:00Z",
+    "end": "2024-09-10T16:59:59Z"
+}}
+USER QUERY:
+    ```
+{query_string}
+    ```
+OUTPUT:
