@@ -67,7 +67,14 @@ class VectorDB:
             path=self.data_path,
             settings=ChromaSettings(anonymized_telemetry=False, allow_reset=True),
         )
+        
         device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        if device == "cpu":
+            self.logger.warning(f"connect_vdb: Torch is running with {device}")
+        else:
+            self.logger.info(f"connect_vdb: Torch is running with {device}")
+        
         self.model = SentenceTransformer(self.model_name, device=device)
         self.collection = self.chroma_client.get_or_create_collection(
             name=self.collection_name

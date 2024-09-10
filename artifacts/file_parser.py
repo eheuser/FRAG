@@ -54,11 +54,11 @@ class ArtifactParser:
                         self.logger.error(f"parse_file: Parser {parser} raised {e}")
             except Exception as e:
                 self.logger.error(f"parse_file: Identifier {identifier} raised {e}")
-            # Remove uploaded file
-            try:
-                os.remove(fpath)
-            except Exception as e:
-                self.logger.error(f"parse_file: Deleting {fpath} raised {e}")
+        # Remove uploaded file
+        try:
+            os.remove(fpath)
+        except Exception as e:
+            self.logger.error(f"parse_file: Deleting {fpath} raised {e}")
         file_info["file_type"] = file_type_string
         return file_info, strings, contents
 

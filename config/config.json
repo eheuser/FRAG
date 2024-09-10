@@ -1,9 +1,9 @@
 {
-  "api_url": "",
+  "api_url": "http://192.168.255.42:1234/v1/",
   "api_key": "",
   "model": "",
-  "context": 0,
-  "max_rag_context": 0,
+  "context": 95000,
+  "max_rag_context": 65000,
   "timeout": 300,
   "temperature": 0.2,
   "debug": false
